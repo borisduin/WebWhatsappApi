@@ -184,7 +184,7 @@ class WhatsAPIDriver(object):
         autoconnect=True,
         logger=None,
         extra_params=None,
-        chrome_options=None,
+        options=None,
         executable_path=None,
     ):
         """Initialises the webdriver"""
@@ -218,11 +218,10 @@ class WhatsAPIDriver(object):
                 )
             if proxy is not None:
                 self.set_proxy(proxy)
-
-            options = Options()
-
+            if options is None:
+                options = Options()
             if headless:
-                options.set_headless()
+                options.headless = True
 
             options.profile = self._profile
 
@@ -254,16 +253,16 @@ class WhatsAPIDriver(object):
                 self._profile.add_argument("--proxy-server=%s" % proxy)
             if headless:
                 self._profile.add_argument("headless")
-            if chrome_options is not None:
-                for option in chrome_options:
+            if options is not None:
+                for option in options:
                     self._profile.add_argument(option)
             self.logger.info("Starting webdriver")
 
             if executable_path is not None:
                 executable_path = os.path.abspath(executable_path)
-                self.driver = webdriver.Chrome(chrome_options=self._profile, executable_path=executable_path, **extra_params)
+                self.driver = webdriver.Chrome(options=self._profile, executable_path=executable_path, **extra_params)
             else:
-                self.driver = webdriver.Chrome(chrome_options=self._profile, **extra_params)
+                self.driver = webdriver.Chrome(options=self._profile, **extra_params)
 
         elif client == "remote":
             if self._profile_path is not None:
